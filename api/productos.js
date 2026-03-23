@@ -1,22 +1,28 @@
-const productos = [
-  { id: 1, nombre: 'Laptop Pro', precio: 25000, categoria: 'Electrónica' },
-  { id: 2, nombre: 'Teclado Mecánico', precio: 1800, categoria: 'Periféricos' },
-  { id: 3, nombre: 'Monitor 4K', precio: 8500, categoria: 'Electrónica' },
-];
+import { supabase } from './_supabase.js';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Content-Type', 'application/json');
+
   const { method, query } = req;
 
   if (method === 'GET') {
     if (query.categoria) {
-      const filtrados = productos.filter(
-        p => p.categoria.toLowerCase() === query.categoria.toLowerCase()
-      );
-      return res.status(200).json(filtrados);
+      const { data, error } = await supabase
+        .from('productos')
+        .select('*')
+        .ilike('categoria', query.categoria);
+
+      if (error) return res.status(500).json({ error: error.message });
+      return res.status(200).json(data);
     }
-    return res.status(200).json(productos);
+
+    const { data, error } = await supabase
+      .from('productos')
+      .select('*');
+
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json(data);
   }
 
   res.setHeader('Allow', ['GET']);

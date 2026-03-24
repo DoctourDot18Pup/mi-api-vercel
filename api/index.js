@@ -1,13 +1,11 @@
+import { readFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 export default function handler(req, res) {
-  res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.status(200).json({
-    mensaje: 'Bienvenido a mi API desplegada en Vercel',
-    version: '1.0.0',
-    endpoints: {
-      usuarios: '/api/usuarios',
-      productos: '/api/productos',
-    },
-    timestamp: new Date().toISOString(),
-  });
+  const html = readFileSync(join(__dirname, '../public/index.html'), 'utf-8');
+  res.setHeader('Content-Type', 'text/html');
+  res.status(200).send(html);
 }
